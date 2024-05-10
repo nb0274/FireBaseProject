@@ -31,12 +31,12 @@ import java.util.Calendar;
 
 public class AddStudentActivity extends AppCompatActivity {
     String[] grades = {"7th", "8th", "9th", "10th", "11th", "12th"};
-    Spinner spGrades;
+    Spinner spinnerGrade;
     ArrayAdapter<String> spinnerAdp;
     AlertDialog.Builder adb;
     LinearLayout vaccineDialog;
-    EditText dialogEtPlace, dialogEtDate, etPrivateName, etFamilyName, etId, etClass;
-    Switch swCanImmune;
+    EditText dialogEtPlace, dialogEtDate, EditTextFirstName, EditTextLastName, EditTextID, EditTextClass;
+    Switch switchCanImmune;
     int currentVaccine;
     Vaccine[] vaccinesData;
     Context activityContext;
@@ -88,15 +88,15 @@ public class AddStudentActivity extends AppCompatActivity {
     }
 
     private void initViews() {
-        etPrivateName = findViewById(R.id.EditTextFirstName);
-        etFamilyName = findViewById(R.id.EditTextLastName);
-        etId = findViewById(R.id.EditTextID);
-        etClass = findViewById(R.id.etClass);
-        spGrades = findViewById(R.id.spGrades);
-        swCanImmune = findViewById(R.id.swCanImmune);
+        EditTextFirstName = findViewById(R.id.EditTextFirstName);
+        EditTextLastName = findViewById(R.id.EditTextLastName);
+        EditTextID = findViewById(R.id.EditTextID);
+        EditTextClass = findViewById(R.id.EditTextClass);
+        spinnerGrade = findViewById(R.id.spinnerGrade);
+        switchCanImmune = findViewById(R.id.switchCanImmune);
 
         spinnerAdp = new ArrayAdapter<>(this, androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, grades);
-        spGrades.setAdapter(spinnerAdp);
+        spinnerGrade.setAdapter(spinnerAdp);
 
         currentVaccine = 0;
         vaccinesData = new Vaccine[2];
@@ -135,7 +135,7 @@ public class AddStudentActivity extends AppCompatActivity {
      * @param view The view object of the button that was clicked.
      */
     public void getFirstVaccineData(View view) {
-        if(swCanImmune.isChecked()) {
+        if(switchCanImmune.isChecked()) {
             currentVaccine = 0;
             displayVaccineDialog(1);
         }
@@ -150,7 +150,7 @@ public class AddStudentActivity extends AppCompatActivity {
      * @param view The view object of the button that was clicked.
      */
     public void getSecondVaccineData(View view) {
-        if(swCanImmune.isChecked()) {
+        if(switchCanImmune.isChecked()) {
             currentVaccine = 1;
             displayVaccineDialog(2);
         }
@@ -208,10 +208,10 @@ public class AddStudentActivity extends AppCompatActivity {
      * @return Whether all the edit text fields contain content, or not.
      */
     private boolean areFieldsFull() {
-        return (!etPrivateName.getText().toString().isEmpty()) &&
-                (!etFamilyName.getText().toString().isEmpty()) &&
-                (!etId.getText().toString().isEmpty()) &&
-                (!etClass.getText().toString().isEmpty());
+        return (!EditTextFirstName.getText().toString().isEmpty()) &&
+                (!EditTextLastName.getText().toString().isEmpty()) &&
+                (!EditTextID.getText().toString().isEmpty()) &&
+                (!EditTextClass.getText().toString().isEmpty());
     }
 
     /**
@@ -219,7 +219,7 @@ public class AddStudentActivity extends AppCompatActivity {
      * @return Whether the class the user entered is valid, or not.
      */
     private boolean isValidClass() {
-        return Integer.parseInt(etClass.getText().toString()) > 0;
+        return Integer.parseInt(EditTextClass.getText().toString()) > 0;
     }
 
     /**
@@ -228,10 +228,10 @@ public class AddStudentActivity extends AppCompatActivity {
      * @return A Student instance initialized with the current data saved in the activity views.
      */
     private Student getCurrentStudent() {
-        return new Student(etPrivateName.getText().toString(),
-                etFamilyName.getText().toString(), etId.getText().toString(),
+        return new Student(EditTextFirstName.getText().toString(),
+                EditTextLastName.getText().toString(), EditTextID.getText().toString(),
                 getSelectedGrade(),
-                Integer.parseInt(etClass.getText().toString()), swCanImmune.isChecked(),
+                Integer.parseInt(EditTextClass.getText().toString()), switchCanImmune.isChecked(),
                 vaccinesData[0], vaccinesData[1]
         );
     }
@@ -254,7 +254,7 @@ public class AddStudentActivity extends AppCompatActivity {
      * @return The selected grade in the grades spinner.
      */
     private int getSelectedGrade() {
-        return spGrades.getSelectedItemPosition() + 7;
+        return spinnerGrade.getSelectedItemPosition() + 7;
     }
 
     /**
@@ -292,19 +292,19 @@ public class AddStudentActivity extends AppCompatActivity {
         {
             if(isValidClass())
             {
-                if(!idsList.contains(etId.getText().toString()))  // If id doesn't exist
+                if(!idsList.contains(EditTextID.getText().toString()))  // If id doesn't exist
                 {
                     resetEmptyVaccines();
                     Student student = getCurrentStudent();
 
                     REF_STUDENTS.child("" + getSelectedGrade())
-                            .child(etClass.getText().toString())
-                            .child(etId.getText().toString()).setValue(student);
+                            .child(EditTextClass.getText().toString())
+                            .child(EditTextID.getText().toString()).setValue(student);
 
                     Toast.makeText(activityContext, "Student saved!",
                             Toast.LENGTH_SHORT).show();
 
-                    idsList.add(etId.getText().toString());  // Adds the new student id to the list
+                    idsList.add(EditTextID.getText().toString());  // Adds the new student id to the list
 
                     vaccinesData[0] = new Vaccine();
                     vaccinesData[1] = new Vaccine();
@@ -347,7 +347,7 @@ public class AddStudentActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item){
         int id = item.getItemId();
 
-        if(id == R.id.menuAllStudents){
+        if(id == R.id.menuShowStudents){
             si.setClass(this, AllStudentsActivity.class);
             startActivity(si);
         }
