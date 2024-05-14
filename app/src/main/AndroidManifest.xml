@@ -13,6 +13,9 @@
         android:theme="@style/Theme.FireBaseProject"
         tools:targetApi="31">
         <activity
+            android:name=".StudentsDisplay"
+            android:exported="false" />
+        <activity
             android:name=".AddStudent"
             android:exported="true">
             <intent-filter>

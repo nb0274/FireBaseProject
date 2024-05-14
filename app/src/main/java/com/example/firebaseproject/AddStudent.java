@@ -2,6 +2,7 @@ package com.example.firebaseproject;
 
 import static com.example.firebaseproject.FBRef.REF_STUDENTS;
 
+import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -27,19 +28,21 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-public class AddStudentActivity extends AppCompatActivity {
+public class AddStudent extends AppCompatActivity {
     String[] grades = {"7th", "8th", "9th", "10th", "11th", "12th"};
     Spinner spinnerGrade;
     ArrayAdapter<String> spinnerAdp;
+    AlertDialog ad;
     AlertDialog.Builder adb;
     LinearLayout vaccineDialog;
     EditText dialogEtPlace, dialogEtDate, editTextFirstName, editTextLastName, editTextID, editTextClass;
     Switch switchCanImmune;
     int currentVaccine;
-    TextView tvAddStudent;
+    TextView textViewHeadLine;
     Vaccine[] vaccinesData;
     Context activityContext;
     Intent si;
@@ -50,9 +53,9 @@ public class AddStudentActivity extends AppCompatActivity {
     DialogInterface.OnClickListener onDialogBtnClick = new DialogInterface.OnClickListener() {
 
         /**
-         * This function reacts to the choice of the user in the vaccine alert dialog.
-         * @param dialog The vaccine alert dialog.
-         * @param which The alert dialog button clicked.
+         * This function reacts to the user choice in the alert dialog - save or cancel.
+         * @param dialog The dialog object that was clicked.
+         * @param which The button that was clicked.
          */
         @Override
         public void onClick(DialogInterface dialog, int which) {
@@ -81,40 +84,13 @@ public class AddStudentActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_student);
 
-        initViews();
-    }
-
-    @Override
-    protected void onStart(){
-        super.onStart();
-
-        savedStudent = null;
-        si = getIntent();
-        savedStudent = (Student) si.getParcelableExtra("Student");
-        si.removeExtra("Student");
-        idsList.clear();
-
-        if(savedStudent != null)
-        {
-            editMode = true;
-            tvAddStudent.setText("Edit Student");
-            displayStudentFields(savedStudent);
-        }
-        else
-        {
-            tvAddStudent.setText("Add Student");
-            getSavedIds();
-        }
-    }
-
-    private void initViews() {
         editTextFirstName = findViewById(R.id.editTextFirstName);
         editTextLastName = findViewById(R.id.editTextLastName);
         editTextID = findViewById(R.id.editTextID);
         editTextClass = findViewById(R.id.editTextClass);
         spinnerGrade = findViewById(R.id.spinnerGrade);
         switchCanImmune = findViewById(R.id.switchCanImmune);
-        tvAddStudent = findViewById(R.id.tvAddStudent);
+        textViewHeadLine = findViewById(R.id.textViewHeadLine);
 
         spinnerAdp = new ArrayAdapter<>(this, androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, grades);
         spinnerGrade.setAdapter(spinnerAdp);
@@ -130,11 +106,35 @@ public class AddStudentActivity extends AppCompatActivity {
         editMode = false;
     }
 
+    @Override
+    protected void onStart(){
+        super.onStart();
+
+        savedStudent = null;
+        si = getIntent();
+        savedStudent = (Student) si.getParcelableExtra("Student");
+        si.removeExtra("Student");
+        idsList.clear();
+
+        if(savedStudent != null)
+        {
+            editMode = true;
+            textViewHeadLine.setText("Edit Student");
+            displayStudentFields(savedStudent);
+        }
+        else
+        {
+            textViewHeadLine.setText("Add Student");
+            getSavedIds();
+        }
+    }
+
     /**
-     * This function displays an alert dialog to input the details of a vaccine.
-     * @param vaccineNum The number of the vaccine to get its details.
+     * This function displays the alert dialog for the user to enter the vaccine data.
+     * @param vaccineNum The number of the vaccine to display its alert dialog.
      */
-    private void displayVaccineDialog(int vaccineNum) {
+
+    private void displayVaccineAlertDialog(int vaccineNum) {
         vaccineDialog = (LinearLayout) getLayoutInflater().inflate(R.layout.vaccine_alert_dialog, null);
 
         dialogEtPlace = vaccineDialog.findViewById(R.id.vaccineDialogEditTextSite);
@@ -156,8 +156,8 @@ public class AddStudentActivity extends AppCompatActivity {
     }
 
     /**
-     * This function displays the info of a given vaccine in the alert dialog.
-     * @param vaccine The given vaccine to display its data.
+     * This function displays the saved vaccine data in the alert dialog.
+     * @param vaccine The vaccine object to display its data.
      */
     private void displaySavedVaccineData(Vaccine vaccine) {
         if((vaccine != null) && (!vaccine.getPlaceTaken().isEmpty()))
@@ -173,13 +173,13 @@ public class AddStudentActivity extends AppCompatActivity {
 
 
     /**
-     * This function displays the first vaccine alert dialog when the suitable button is clicked.
-     * @param view The view object of the button that was clicked.
+     * This function gets the first vaccine data from the user.
+     * @param view The view object of the button that was clicked in order to get the first vaccine data.
      */
     public void getFirstVaccineData(View view) {
         if(switchCanImmune.isChecked()) {
             currentVaccine = 0;
-            displayVaccineDialog(1);
+            displayVaccineAlertDialog(1);
         }
         else {
             Toast.makeText(activityContext, "Student can't immune!",
@@ -188,14 +188,14 @@ public class AddStudentActivity extends AppCompatActivity {
     }
 
     /**
-     * This function displays the second vaccine alert dialog when the suitable button is clicked.
-     * @param view The view object of the button that was clicked.
+     * This function gets the second vaccine data from the user.
+     * @param view The view object of the button that was clicked in order to get the second vaccine data.
      */
     public void getSecondVaccineData(View view) {
         if(switchCanImmune.isChecked()) {
             if(vaccinesData[0] != null && !vaccinesData[0].getPlaceTaken().isEmpty()) {
                 currentVaccine = 1;
-                displayVaccineDialog(2);
+                displayVaccineAlertDialog(2);
             }
             else {
                 Toast.makeText(activityContext, "You must enter the first vaccine before the second!",
@@ -209,9 +209,8 @@ public class AddStudentActivity extends AppCompatActivity {
     }
 
     /**
-     * This function opens a date picker dialog when the user clicks on the select date edit text
-     * in the vaccine alert dialog. It saves the user's choice in the current vaccine instance.
-     * @param view The view object of the select date edit text.
+     * This function displays the date picker dialog for the user to choose a date.
+     * @param view The view object of the button that was clicked in order to choose a date.
      */
     public void dialogChooseDate(View view) {
         // Saves dates for future use
@@ -234,14 +233,14 @@ public class AddStudentActivity extends AppCompatActivity {
         int day = savedCalendar.get(Calendar.DAY_OF_MONTH);
 
         DatePickerDialog datePickerDialog = new DatePickerDialog(
-                AddStudentActivity.this,
+                AddStudent.this,
                 new DatePickerDialog.OnDateSetListener() {
                     /**
-                     * This function saves the user's choice in the date picker.
-                     * @param view The view object of the date picker.
-                     * @param year The selected year.
-                     * @param monthOfYear The selected month.
-                     * @param dayOfMonth The selected day.
+                     * This function reacts to the user choice in the date picker dialog.
+                     * @param view The date picker dialog view.
+                     * @param year The year the user chose.
+                     * @param monthOfYear The month the user chose.
+                     * @param dayOfMonth The day the user chose.
                      */
                     @Override
                     public void onDateSet(DatePicker view, int year,
@@ -264,8 +263,8 @@ public class AddStudentActivity extends AppCompatActivity {
     }
 
     /**
-     * This function checks if all the edit text fields contain content in them.
-     * @return Whether all the edit text fields contain content, or not.
+     * This function checks if all the fields are full.
+     * @return True if all the fields are full, false otherwise.
      */
     private boolean areFieldsFull() {
         return (!editTextFirstName.getText().toString().isEmpty()) &&
@@ -275,17 +274,16 @@ public class AddStudentActivity extends AppCompatActivity {
     }
 
     /**
-     * This function checks if the class the user entered is valid(bigger than 0).
-     * @return Whether the class the user entered is valid, or not.
+     * This function checks if the class number is valid.
+     * @return True if the class number is valid, false otherwise.
      */
     private boolean isValidClass() {
         return Integer.parseInt(editTextClass.getText().toString()) > 0;
     }
 
     /**
-     * This function gets a Student instance initialized with the current data saved in the
-     * activity views.
-     * @return A Student instance initialized with the current data saved in the activity views.
+     * This function gets the current student object from the fields.
+     * @return The student object with the current fields data.
      */
     private Student getCurrentStudent() {
         return new Student(editTextFirstName.getText().toString(),
@@ -297,8 +295,7 @@ public class AddStudentActivity extends AppCompatActivity {
     }
 
     /**
-     * This function resets the date field of the saved vaccines if there isn't a place saved in
-     * them - may occur when the user chose only date and then closed the alert dialog.
+     * This function resets the empty vaccines.
      */
     private void resetEmptyVaccines() {
         if(vaccinesData[0].getPlaceTaken() == null) {
@@ -310,15 +307,15 @@ public class AddStudentActivity extends AppCompatActivity {
     }
 
     /**
-     * This function gets the selected grade in the grades spinner.
-     * @return The selected grade in the grades spinner.
+     * This function gets the selected grade from the spinner.
+     * @return The selected grade.
      */
     private int getSelectedGrade() {
         return spinnerGrade.getSelectedItemPosition() + 7;
     }
 
     /**
-     * This function gets all the students ids from the DB, and saves it in the ids array list.
+     * This function gets the saved ids from the database.
      */
     private void getSavedIds() {
         REF_STUDENTS.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -344,8 +341,8 @@ public class AddStudentActivity extends AppCompatActivity {
     }
 
     /**
-     * This function saves the current Student's data in the DB - if all the fields are valid.
-     * @param view The view object of the button that was clicked in order to save the Student.
+     * This function saves the student in the database.
+     * @param view The view object of the button that was clicked in order to save the student.
      */
     public void saveStudent(View view) {
         if(areFieldsFull())
@@ -395,11 +392,10 @@ public class AddStudentActivity extends AppCompatActivity {
     }
 
     /**
-     * This function displays a given student data in the activity fields.
-     * @param student The student object to display its fields.
+     * This function displays the student fields.
      */
     private void displayStudentFields(Student student) {
-        EditTextFirstNameEditTextFirstName.setText(student.getFirstName());
+        editTextFirstName.setText(student.getFirstName());
         editTextLastName.setText(student.getLastName());
         editTextID.setText(student.getID());
         spinnerGrade.setSelection(student.getGrade() - 7);
@@ -411,7 +407,7 @@ public class AddStudentActivity extends AppCompatActivity {
     }
 
     /**
-     * This function resets the student fields of the activity.
+     * This function resets the student fields.
      */
     private void resetStudentFields() {
         editTextFirstName.setText("");
@@ -426,8 +422,8 @@ public class AddStudentActivity extends AppCompatActivity {
     }
 
     /**
-     * This function resets the vaccines data if needed(depends on the canImmune value).
-     * @param canImmune The value of the can immune field.
+     * This function validates the vaccines saving.
+     * @param canImmune True if the student can immune, false otherwise.
      */
     private void validateVaccinesSaving(boolean canImmune) {
         if(!canImmune) {
@@ -437,7 +433,7 @@ public class AddStudentActivity extends AppCompatActivity {
     }
 
     /**
-     * This function deletes a given student from the DB.
+     * This function deletes the student from the database.
      * @param student The student object to delete.
      */
     private void deleteStudent(Student student) {
@@ -452,11 +448,9 @@ public class AddStudentActivity extends AppCompatActivity {
     }
 
     /**
-     * This function deletes an old student object from the DB if some of its fields are different
-     * from the new student - its grade, class and id. It's important to do this before adding new
-     * student with these different fields.
-     * @param oldStudent The object of the old student.
-     * @param newStudent The object of the new student.
+     * This function deletes the old student object if needed.
+     * @param oldStudent The old student object.
+     * @param newStudent The new student object.
      */
     private void deleteOldWhenNeeded(Student oldStudent, Student newStudent) {
         if((newStudent.getClassNumber() != oldStudent.getClassNumber()) ||
@@ -469,7 +463,7 @@ public class AddStudentActivity extends AppCompatActivity {
     }
 
     /**
-     * This function saves a given student object in the DB.
+     * This function saves the student in the database.
      * @param student The student object to save.
      */
     private void saveStudInDB(Student student) {
@@ -485,9 +479,8 @@ public class AddStudentActivity extends AppCompatActivity {
     }
 
     /**
-     * This function presents the options menu for moving between activities.
-     * @param menu the options menu in which you place your items.
-     * @return true in order to show the menu, otherwise false.
+     * This function reacts to the user choice in the menu.
+     * @return True if the item was clicked, false otherwise.
      */
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
@@ -497,20 +490,19 @@ public class AddStudentActivity extends AppCompatActivity {
     }
 
     /**
-     * This function reacts to the user choice in the options menu - it moves to the chosen
-     * activity from the menu, or resets the current one.
-     * @param item the menu item that was selected.
-     * @return must return true for the menu to react.
+     * This function reacts to the user choice in the menu.
+     * @param item The item that was clicked.
+     * @return True if the item was clicked, false otherwise.
      */
     public boolean onOptionsItemSelected(@NonNull MenuItem item){
         int id = item.getItemId();
 
         editMode = false;
         resetStudentFields();
-        tvAddStudent.setText("Add Student");
+        textViewHeadLine.setText("Add Student");
 
-        if(id == R.id.menuAllStudents){
-            si.setClass(this, AllStudentsActivity.class);
+        if(id == R.id.menuShowStudents){
+            si.setClass(this, StudentsDisplay.class);
             startActivity(si);
         }
         else if(id == R.id.menuSortAndFilter) {
