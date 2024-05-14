@@ -2,44 +2,64 @@ package com.example.firebaseproject;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+
 import androidx.annotation.NonNull;
+
+/**
+ * Student class:
+ * saves data about each student - its name, grade, class, and 2 vaccines info.
+ * @author Ori Roitzaid <or1901 @ bs.amalnet.k12.il>
+ * @version	1
+ * @since 12/4/2024
+ */
 public class Student implements Parcelable {
-    private String privateName, familyName, id;
-    private int grade, classNum;
+    private String firstName, lastName, id;
+    private int grade, classNumber;
     private boolean canImmune;
     private Vaccine firstVaccine, secondVaccine;
 
-    public Student(String privateName, String familyName, String id, int grade, int classNum, boolean canImmune, Vaccine firstVaccine, Vaccine secondVaccine) {
-        this.privateName = privateName;
-        this.familyName = familyName;
+    public Student(String privateName, String familyName, String id, int grade, int classNumber, boolean canImmune, Vaccine firstVaccine, Vaccine secondVaccine) {
+        this.firstName = privateName;
+        this.lastName = familyName;
         this.id = id;
         this.grade = grade;
-        this.classNum = classNum;
+        this.classNumber = classNumber;
         this.canImmune = canImmune;
-        this.firstVaccine = new Vaccine(firstVaccine);
-        this.secondVaccine = new Vaccine(secondVaccine);
+        this.firstVaccine = firstVaccine;
+        this.secondVaccine = secondVaccine;
     }
 
     public Student() {
-        this.privateName = "";
-        this.familyName = "";
+        this.firstName = "";
+        this.lastName = "";
         this.id = "";
         this.grade = 0;
-        this.classNum = 0;
+        this.classNumber = 0;
         this.canImmune = false;
         this.firstVaccine = new Vaccine();
         this.secondVaccine = new Vaccine();
     }
 
-    public String getPrivateName() {
-        return this.privateName;
+    public Student(Student other) {
+        this.firstName = other.firstName;
+        this.lastName = other.lastName;
+        this.id = other.id;
+        this.grade = other.grade;
+        this.classNumber = other.classNumber;
+        this.canImmune = other.canImmune;
+        this.firstVaccine = new Vaccine(other.firstVaccine);
+        this.secondVaccine = new Vaccine(other.secondVaccine);
     }
 
-    public String getFamilyName() {
-        return this.familyName;
+    public String getFirstName() {
+        return this.firstName;
     }
 
-    public String getId() {
+    public String getLastName() {
+        return this.lastName;
+    }
+
+    public String getID() {
         return this.id;
     }
 
@@ -47,8 +67,8 @@ public class Student implements Parcelable {
         return this.grade;
     }
 
-    public int getClassNum() {
-        return this.classNum;
+    public int getClassNumber() {
+        return this.classNumber;
     }
 
     public boolean getCanImmune() {
@@ -63,15 +83,15 @@ public class Student implements Parcelable {
         return this.secondVaccine;
     }
 
-    public void setPrivateName(String name) {
-        this.privateName = name;
+    public void setFirstName(String name) {
+        this.firstName = name;
     }
 
-    public void setFamilyName(String name) {
-        this.familyName = name;
+    public void setLastName(String name) {
+        this.lastName = name;
     }
 
-    public void setId(String id) {
+    public void setID(String id) {
         this.id = id;
     }
 
@@ -79,8 +99,8 @@ public class Student implements Parcelable {
         this.grade = grade;
     }
 
-    public void setClassNum(int classNum) {
-        this.classNum = classNum;
+    public void setClassNumber(int classNum) {
+        this.classNumber = classNum;
     }
 
     public void setCanImmune(boolean canImmune) {
@@ -88,19 +108,20 @@ public class Student implements Parcelable {
     }
 
     public void setFirstVaccine(Vaccine vaccine) {
-        this.firstVaccine = new Vaccine(vaccine);
+        this.firstVaccine = vaccine;
     }
 
     public void setSecondVaccine(Vaccine vaccine) {
-        this.secondVaccine = new Vaccine(vaccine);
+        this.secondVaccine = vaccine;
     }
 
+    // Parcelable implementation
     protected Student(Parcel in) {
-        privateName = in.readString();
-        familyName = in.readString();
+        firstName = in.readString();
+        lastName = in.readString();
         id = in.readString();
         grade = in.readInt();
-        classNum = in.readInt();
+        classNumber = in.readInt();
         canImmune = in.readByte() != 0;
         firstVaccine = in.readParcelable(Vaccine.class.getClassLoader());
         secondVaccine = in.readParcelable(Vaccine.class.getClassLoader());
@@ -113,11 +134,11 @@ public class Student implements Parcelable {
 
     @Override
     public void writeToParcel(@NonNull Parcel parcel, int i) {
-        parcel.writeString(privateName);
-        parcel.writeString(familyName);
+        parcel.writeString(firstName);
+        parcel.writeString(lastName);
         parcel.writeString(id);
         parcel.writeInt(grade);
-        parcel.writeInt(classNum);
+        parcel.writeInt(classNumber);
         parcel.writeByte((byte) (canImmune ? 1 : 0));
         parcel.writeParcelable(firstVaccine, i);
         parcel.writeParcelable(secondVaccine, i);

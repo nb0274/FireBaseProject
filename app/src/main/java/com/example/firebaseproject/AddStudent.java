@@ -16,6 +16,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -35,13 +36,16 @@ public class AddStudentActivity extends AppCompatActivity {
     ArrayAdapter<String> spinnerAdp;
     AlertDialog.Builder adb;
     LinearLayout vaccineDialog;
-    EditText dialogEtPlace, dialogEtDate, EditTextFirstName, EditTextLastName, EditTextID, EditTextClass;
+    EditText dialogEtPlace, dialogEtDate, editTextFirstName, editTextLastName, editTextID, editTextClass;
     Switch switchCanImmune;
     int currentVaccine;
+    TextView tvAddStudent;
     Vaccine[] vaccinesData;
     Context activityContext;
     Intent si;
     ArrayList<String> idsList;
+    Student savedStudent;
+    boolean editMode;
 
     DialogInterface.OnClickListener onDialogBtnClick = new DialogInterface.OnClickListener() {
 
@@ -84,16 +88,33 @@ public class AddStudentActivity extends AppCompatActivity {
     protected void onStart(){
         super.onStart();
 
-        getSavedIds();
+        savedStudent = null;
+        si = getIntent();
+        savedStudent = (Student) si.getParcelableExtra("Student");
+        si.removeExtra("Student");
+        idsList.clear();
+
+        if(savedStudent != null)
+        {
+            editMode = true;
+            tvAddStudent.setText("Edit Student");
+            displayStudentFields(savedStudent);
+        }
+        else
+        {
+            tvAddStudent.setText("Add Student");
+            getSavedIds();
+        }
     }
 
     private void initViews() {
-        EditTextFirstName = findViewById(R.id.EditTextFirstName);
-        EditTextLastName = findViewById(R.id.EditTextLastName);
-        EditTextID = findViewById(R.id.EditTextID);
-        EditTextClass = findViewById(R.id.EditTextClass);
+        editTextFirstName = findViewById(R.id.editTextFirstName);
+        editTextLastName = findViewById(R.id.editTextLastName);
+        editTextID = findViewById(R.id.editTextID);
+        editTextClass = findViewById(R.id.editTextClass);
         spinnerGrade = findViewById(R.id.spinnerGrade);
         switchCanImmune = findViewById(R.id.switchCanImmune);
+        tvAddStudent = findViewById(R.id.tvAddStudent);
 
         spinnerAdp = new ArrayAdapter<>(this, androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, grades);
         spinnerGrade.setAdapter(spinnerAdp);
@@ -106,6 +127,7 @@ public class AddStudentActivity extends AppCompatActivity {
         activityContext = this;
         si = new Intent();
         idsList = new ArrayList<>();
+        editMode = false;
     }
 
     /**
@@ -127,8 +149,28 @@ public class AddStudentActivity extends AppCompatActivity {
         adb.setPositiveButton("Save", onDialogBtnClick);
         adb.setNegativeButton("Cancel", onDialogBtnClick);
 
-        adb.show();
+        ad = adb.create();
+        ad.show();
+
+        displaySavedVaccineData(vaccinesData[currentVaccine]);
     }
+
+    /**
+     * This function displays the info of a given vaccine in the alert dialog.
+     * @param vaccine The given vaccine to display its data.
+     */
+    private void displaySavedVaccineData(Vaccine vaccine) {
+        if((vaccine != null) && (!vaccine.getPlaceTaken().isEmpty()))
+        {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(vaccine.getDate());
+
+            dialogEtPlace.setText(vaccine.getPlaceTaken());
+            dialogEtDate.setText(dateFormat.format(calendar.getTime()));
+        }
+    }
+
 
     /**
      * This function displays the first vaccine alert dialog when the suitable button is clicked.
@@ -151,8 +193,14 @@ public class AddStudentActivity extends AppCompatActivity {
      */
     public void getSecondVaccineData(View view) {
         if(switchCanImmune.isChecked()) {
-            currentVaccine = 1;
-            displayVaccineDialog(2);
+            if(vaccinesData[0] != null && !vaccinesData[0].getPlaceTaken().isEmpty()) {
+                currentVaccine = 1;
+                displayVaccineDialog(2);
+            }
+            else {
+                Toast.makeText(activityContext, "You must enter the first vaccine before the second!",
+                        Toast.LENGTH_LONG).show();
+            }
         }
         else {
             Toast.makeText(activityContext, "Student can't immune!",
@@ -166,12 +214,24 @@ public class AddStudentActivity extends AppCompatActivity {
      * @param view The view object of the select date edit text.
      */
     public void dialogChooseDate(View view) {
-        // Saves the current time details, in order to display it in the picker
+        // Saves dates for future use
         Calendar nowCalendar = Calendar.getInstance();
-        int year = nowCalendar.get(Calendar.YEAR);
-        int month = nowCalendar.get(Calendar.MONTH);
-        int day = nowCalendar.get(Calendar.DAY_OF_MONTH);
+        Calendar savedCalendar = Calendar.getInstance();
         Calendar chosenDate = Calendar.getInstance();
+
+        // Checks if a date is already saved
+        if((vaccinesData[currentVaccine] != null) && (vaccinesData[currentVaccine].getDate() != 0))
+        {
+            savedCalendar.setTimeInMillis(vaccinesData[currentVaccine].getDate());
+        }
+        else if(vaccinesData[currentVaccine] == null)  // Checks if there is no vaccine object
+        {
+            vaccinesData[currentVaccine] = new Vaccine();
+        }
+
+        int year = savedCalendar.get(Calendar.YEAR);
+        int month = savedCalendar.get(Calendar.MONTH);
+        int day = savedCalendar.get(Calendar.DAY_OF_MONTH);
 
         DatePickerDialog datePickerDialog = new DatePickerDialog(
                 AddStudentActivity.this,
@@ -208,10 +268,10 @@ public class AddStudentActivity extends AppCompatActivity {
      * @return Whether all the edit text fields contain content, or not.
      */
     private boolean areFieldsFull() {
-        return (!EditTextFirstName.getText().toString().isEmpty()) &&
-                (!EditTextLastName.getText().toString().isEmpty()) &&
-                (!EditTextID.getText().toString().isEmpty()) &&
-                (!EditTextClass.getText().toString().isEmpty());
+        return (!editTextFirstName.getText().toString().isEmpty()) &&
+                (!editTextLastName.getText().toString().isEmpty()) &&
+                (!editTextID.getText().toString().isEmpty()) &&
+                (!editTextClass.getText().toString().isEmpty());
     }
 
     /**
@@ -219,7 +279,7 @@ public class AddStudentActivity extends AppCompatActivity {
      * @return Whether the class the user entered is valid, or not.
      */
     private boolean isValidClass() {
-        return Integer.parseInt(EditTextClass.getText().toString()) > 0;
+        return Integer.parseInt(editTextClass.getText().toString()) > 0;
     }
 
     /**
@@ -228,10 +288,10 @@ public class AddStudentActivity extends AppCompatActivity {
      * @return A Student instance initialized with the current data saved in the activity views.
      */
     private Student getCurrentStudent() {
-        return new Student(EditTextFirstName.getText().toString(),
-                EditTextLastName.getText().toString(), EditTextID.getText().toString(),
+        return new Student(editTextFirstName.getText().toString(),
+                editTextLastName.getText().toString(), editTextID.getText().toString(),
                 getSelectedGrade(),
-                Integer.parseInt(EditTextClass.getText().toString()), switchCanImmune.isChecked(),
+                Integer.parseInt(editTextClass.getText().toString()), switchCanImmune.isChecked(),
                 vaccinesData[0], vaccinesData[1]
         );
     }
@@ -292,22 +352,30 @@ public class AddStudentActivity extends AppCompatActivity {
         {
             if(isValidClass())
             {
-                if(!idsList.contains(EditTextID.getText().toString()))  // If id doesn't exist
+                if(!idsList.contains(editTextID.getText().toString()))  // If id doesn't exist
                 {
                     resetEmptyVaccines();
+                    validateVaccinesSaving(switchCanImmune.isChecked());
                     Student student = getCurrentStudent();
 
-                    REF_STUDENTS.child("" + getSelectedGrade())
-                            .child(EditTextClass.getText().toString())
-                            .child(EditTextID.getText().toString()).setValue(student);
+                    // If in edit mode, deletes the old object if needed
+                    if(editMode) {
+                        deleteOldWhenNeeded(savedStudent, student);
+                    }
+
+                    saveStudInDB(student);
 
                     Toast.makeText(activityContext, "Student saved!",
                             Toast.LENGTH_SHORT).show();
 
-                    idsList.add(EditTextID.getText().toString());  // Adds the new student id to the list
-
-                    vaccinesData[0] = new Vaccine();
-                    vaccinesData[1] = new Vaccine();
+                    if(!editMode) {
+                        vaccinesData[0] = new Vaccine();
+                        vaccinesData[1] = new Vaccine();
+                        idsList.add(editTextID.getText().toString());  // Adds the new student id to the list
+                    }
+                    else {
+                        savedStudent = new Student(student);
+                    }
                 }
 
                 else {
@@ -324,6 +392,96 @@ public class AddStudentActivity extends AppCompatActivity {
             Toast.makeText(activityContext, "There is an empty field!",
                     Toast.LENGTH_SHORT).show();
         }
+    }
+
+    /**
+     * This function displays a given student data in the activity fields.
+     * @param student The student object to display its fields.
+     */
+    private void displayStudentFields(Student student) {
+        EditTextFirstNameEditTextFirstName.setText(student.getFirstName());
+        editTextLastName.setText(student.getLastName());
+        editTextID.setText(student.getID());
+        spinnerGrade.setSelection(student.getGrade() - 7);
+        editTextClass.setText("" + student.getClassNumber());
+        switchCanImmune.setChecked(student.getCanImmune());
+
+        vaccinesData[0] = new Vaccine(student.getFirstVaccine());
+        vaccinesData[1] = new Vaccine(student.getSecondVaccine());
+    }
+
+    /**
+     * This function resets the student fields of the activity.
+     */
+    private void resetStudentFields() {
+        editTextFirstName.setText("");
+        editTextLastName.setText("");
+        editTextID.setText("");
+        spinnerGrade.setSelection(0);
+        editTextClass.setText("");
+        switchCanImmune.setChecked(false);
+
+        vaccinesData[0] = new Vaccine();
+        vaccinesData[1] = new Vaccine();
+    }
+
+    /**
+     * This function resets the vaccines data if needed(depends on the canImmune value).
+     * @param canImmune The value of the can immune field.
+     */
+    private void validateVaccinesSaving(boolean canImmune) {
+        if(!canImmune) {
+            vaccinesData[0] = null;
+            vaccinesData[1] = null;
+        }
+    }
+
+    /**
+     * This function deletes a given student from the DB.
+     * @param student The student object to delete.
+     */
+    private void deleteStudent(Student student) {
+        if(student.getCanImmune()) {
+            REF_STUDENTS.child("CanImmune").child("" + student.getGrade())
+                    .child("" + student.getClassNumber()).child(student.getID()).removeValue();
+        }
+        else {
+            REF_STUDENTS.child("CannotImmune").child("" + student.getGrade())
+                    .child("" + student.getClassNumber()).child(student.getID()).removeValue();
+        }
+    }
+
+    /**
+     * This function deletes an old student object from the DB if some of its fields are different
+     * from the new student - its grade, class and id. It's important to do this before adding new
+     * student with these different fields.
+     * @param oldStudent The object of the old student.
+     * @param newStudent The object of the new student.
+     */
+    private void deleteOldWhenNeeded(Student oldStudent, Student newStudent) {
+        if((newStudent.getClassNumber() != oldStudent.getClassNumber()) ||
+                (oldStudent.getGrade() != newStudent.getGrade()) ||
+                (!oldStudent.getID().equals(newStudent.getID())) ||
+                (!(oldStudent.getCanImmune() == newStudent.getCanImmune())))
+        {
+            deleteStudent(oldStudent);
+        }
+    }
+
+    /**
+     * This function saves a given student object in the DB.
+     * @param student The student object to save.
+     */
+    private void saveStudInDB(Student student) {
+        String canImmune = "CannotImmune";
+
+        if(student.getCanImmune()) {
+            canImmune = "CanImmune";
+        }
+
+        REF_STUDENTS.child(canImmune).child("" + getSelectedGrade())
+                .child(editTextClass.getText().toString())
+                .child(editTextID.getText().toString()).setValue(student);
     }
 
     /**
@@ -347,9 +505,20 @@ public class AddStudentActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item){
         int id = item.getItemId();
 
-        if(id == R.id.menuShowStudents){
+        editMode = false;
+        resetStudentFields();
+        tvAddStudent.setText("Add Student");
+
+        if(id == R.id.menuAllStudents){
             si.setClass(this, AllStudentsActivity.class);
             startActivity(si);
+        }
+        else if(id == R.id.menuSortAndFilter) {
+            si.setClass(this, SortAndFilterActivity.class);
+            startActivity(si);
+        }
+        else {
+            getSavedIds();
         }
 
         return super.onOptionsItemSelected(item);
