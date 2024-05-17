@@ -15,21 +15,14 @@ import com.example.firebaseproject.Student;
 
 import java.util.ArrayList;
 
-/**
- * StateStudent class:
- * a custom adapter between a list of Student objects, and a given spinner/list view.
- * @author Ori Roitzaid <or1901 @ bs.amalnet.k12.il>
- * @version	1
- * @since 7/5/2024
- */
 public class AdapterForStudent extends BaseAdapter {
     private ArrayList<Student> studentsList;
     LayoutInflater inflater;
 
     /**
-     * A constructor which initializes the adapter with a given context, and students list.
-     * @param context The context to use the adapter in.
-     * @param studentsList The list of students to use in the adapter.
+     * This function initializes the adapter.
+     * @param context The context of the activity.
+     * @param studentsList The list of students.
      */
     public AdapterForStudent(@NonNull Context context, ArrayList<Student> studentsList) {
         this.studentsList = studentsList;
@@ -37,8 +30,8 @@ public class AdapterForStudent extends BaseAdapter {
     }
 
     /**
-     * This function gets the number of students in the adapter.
-     * @return The number of students in the adapter
+     * This function returns the number of students in the list.
+     * @return The number of students in the list.
      */
     @Override
     public int getCount() {
@@ -46,9 +39,9 @@ public class AdapterForStudent extends BaseAdapter {
     }
 
     /**
-     * This function gets the item in a given position in the Students list.
-     * @param i The given position.
-     * @return The item in the given position in the Students list.
+     * This function returns the student at the given position.
+     * @param i The position of the student.
+     * @return The student at the given position.
      */
     @Override
     public Object getItem(int i) {
@@ -56,9 +49,9 @@ public class AdapterForStudent extends BaseAdapter {
     }
 
     /**
-     * This function gets the id of a students from the list(basically its position).
-     * @param i The student position in the list.
-     * @return The id of the given Student's position.
+     * This function returns the ID of the student at the given position.
+     * @param i The position of the student.
+     * @return The ID of the student at the given position.
      */
     @Override
     public long getItemId(int i) {
@@ -66,12 +59,11 @@ public class AdapterForStudent extends BaseAdapter {
     }
 
     /**
-     * This function makes a view object for a given Student in the list(it makes each row in the
-     * spinner).
-     * @param position The position of the Student in the list.
-     * @param view The view object to use.
-     * @param parent The ViewGroup - probably the spinner view.
-     * @return A view object for the given Student in the list.
+     * This function returns the view of the student at the given position.
+     * @param position The position of the student.
+     * @param view The view of the student.
+     * @param parent The parent of the view.
+     * @return The view of the student at the given position.
      */
     @NonNull
     @Override
