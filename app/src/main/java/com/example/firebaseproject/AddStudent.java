@@ -267,10 +267,7 @@ public class AddStudent extends AppCompatActivity {
      * @return True if all the fields are full, false otherwise.
      */
     private boolean areFieldsFull() {
-        return (!editTextFirstName.getText().toString().isEmpty()) &&
-                (!editTextLastName.getText().toString().isEmpty()) &&
-                (!editTextID.getText().toString().isEmpty()) &&
-                (!editTextClass.getText().toString().isEmpty());
+        return (!editTextFirstName.getText().toString().isEmpty()) && (!editTextLastName.getText().toString().isEmpty()) && (!editTextID.getText().toString().isEmpty()) && (!editTextClass.getText().toString().isEmpty());
     }
 
     /**
@@ -286,11 +283,7 @@ public class AddStudent extends AppCompatActivity {
      * @return The student object with the current fields data.
      */
     private Student getCurrentStudent() {
-        return new Student(editTextFirstName.getText().toString(),
-                editTextLastName.getText().toString(), editTextID.getText().toString(),
-                getSelectedGrade(),
-                Integer.parseInt(editTextClass.getText().toString()), switchCanImmune.isChecked(),
-                vaccinesData[0], vaccinesData[1]
+        return new Student(editTextFirstName.getText().toString(), editTextLastName.getText().toString(), editTextID.getText().toString(), getSelectedGrade(), Integer.parseInt(editTextClass.getText().toString()), switchCanImmune.isChecked(), vaccinesData[0], vaccinesData[1]
         );
     }
 
@@ -438,12 +431,10 @@ public class AddStudent extends AppCompatActivity {
      */
     private void deleteStudent(Student student) {
         if(student.getCanImmune()) {
-            REF_STUDENTS.child("CanImmune").child("" + student.getGrade())
-                    .child("" + student.getClassNumber()).child(student.getID()).removeValue();
+            REF_STUDENTS.child("CanImmune").child("" + student.getGrade()).child("" + student.getClassNumber()).child(student.getID()).removeValue();
         }
         else {
-            REF_STUDENTS.child("CannotImmune").child("" + student.getGrade())
-                    .child("" + student.getClassNumber()).child(student.getID()).removeValue();
+            REF_STUDENTS.child("CannotImmune").child("" + student.getGrade()).child("" + student.getClassNumber()).child(student.getID()).removeValue();
         }
     }
 
@@ -453,10 +444,7 @@ public class AddStudent extends AppCompatActivity {
      * @param newStudent The new student object.
      */
     private void deleteOldWhenNeeded(Student oldStudent, Student newStudent) {
-        if((newStudent.getClassNumber() != oldStudent.getClassNumber()) ||
-                (oldStudent.getGrade() != newStudent.getGrade()) ||
-                (!oldStudent.getID().equals(newStudent.getID())) ||
-                (!(oldStudent.getCanImmune() == newStudent.getCanImmune())))
+        if((newStudent.getClassNumber() != oldStudent.getClassNumber()) || (oldStudent.getGrade() != newStudent.getGrade()) || (!oldStudent.getID().equals(newStudent.getID())) || (!(oldStudent.getCanImmune() == newStudent.getCanImmune())))
         {
             deleteStudent(oldStudent);
         }
@@ -473,9 +461,7 @@ public class AddStudent extends AppCompatActivity {
             canImmune = "CanImmune";
         }
 
-        REF_STUDENTS.child(canImmune).child("" + getSelectedGrade())
-                .child(editTextClass.getText().toString())
-                .child(editTextID.getText().toString()).setValue(student);
+        REF_STUDENTS.child(canImmune).child("" + getSelectedGrade()).child(editTextClass.getText().toString()).child(editTextID.getText().toString()).setValue(student);
     }
 
     /**
