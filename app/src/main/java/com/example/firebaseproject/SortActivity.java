@@ -29,7 +29,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
-public class SortAndFilterActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+public class SortActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     String[] filterOptions = {"Immune students of a given class", "Immune students of a given grade", "All immune students", "All students that can't immune"};
     Spinner spFilterOptions, classDialogSpGrade, classDialogSpClass, gradeDialogSpGrade;
     ArrayAdapter<String> filtersSpinnerAdp;
@@ -146,7 +146,7 @@ public class SortAndFilterActivity extends AppCompatActivity implements AdapterV
     }
 
     private void displayClassDialog() {
-        classDetailsDialog = (LinearLayout) getLayoutInflater().inflate(R.layout.class_details_dialog, null);
+        classDetailsDialog = (LinearLayout) getLayoutInflater().inflate(R.layout.class_alert_dialog, null);
 
         classDialogSpGrade = classDetailsDialog.findViewById(R.id.classDialogSpGrade);
         classDialogSpClass = classDetailsDialog.findViewById(R.id.classDialogSpClass);
@@ -176,7 +176,7 @@ public class SortAndFilterActivity extends AppCompatActivity implements AdapterV
     }
 
     private void displayGradeDialog() {
-        gradeDetailsDialog = (LinearLayout) getLayoutInflater().inflate(R.layout.grade_details_dialog, null);
+        gradeDetailsDialog = (LinearLayout) getLayoutInflater().inflate(R.layout.grade_alert_dialog, null);
 
         gradeDialogSpGrade = gradeDetailsDialog.findViewById(R.id.gradeDialogSpGrade);
 

@@ -492,7 +492,7 @@ public class AddStudent extends AppCompatActivity {
             startActivity(si);
         }
         else if(id == R.id.menuSortAndFilter) {
-            si.setClass(this, SortAndFilterActivity.class);
+            si.setClass(this, SortActivity.class);
             startActivity(si);
         }
         else {

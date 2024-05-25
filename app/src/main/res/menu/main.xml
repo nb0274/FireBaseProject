@@ -8,6 +8,16 @@
 
     <item
         android:id="@+id/menuShowStudents"
-        android:title="All Students"
+        android:title="Show Student"
+        android:orderInCategory="200"/>
+
+    <item
+        android:id="@+id/menuSortStudents"
+        android:title="Show Student"
+        android:orderInCategory="300"/>
+
+    <item
+        android:id="@+id/menuCredits"
+        android:title="Show Student"
         android:orderInCategory="200"/>
 </menu>
