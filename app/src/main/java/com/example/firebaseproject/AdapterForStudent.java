@@ -11,47 +11,38 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.example.firebaseproject.Student;
-
 import java.util.ArrayList;
 
 public class AdapterForStudent extends BaseAdapter {
-    private ArrayList<Student> studentsList;
+    private ArrayList<Student> lst;
     LayoutInflater inflater;
 
     /**
-     * This function initializes the adapter.
-     * @param context The context of the activity.
-     * @param studentsList The list of students.
+     * This function is called when the view is created.
      */
     public AdapterForStudent(@NonNull Context context, ArrayList<Student> studentsList) {
-        this.studentsList = studentsList;
+        this.lst = studentsList;
         inflater = (LayoutInflater.from(context));
     }
 
     /**
-     * This function returns the number of students in the list.
-     * @return The number of students in the list.
+     * This function is called when the view is created.
      */
     @Override
     public int getCount() {
-        return studentsList.size();
+        return lst.size();
     }
 
     /**
-     * This function returns the student at the given position.
-     * @param i The position of the student.
-     * @return The student at the given position.
+     * This function is called when the view is created.
      */
     @Override
     public Object getItem(int i) {
-        return studentsList.get(i);
+        return lst.get(i);
     }
 
     /**
-     * This function returns the ID of the student at the given position.
-     * @param i The position of the student.
-     * @return The ID of the student at the given position.
+     * This function is called when the view is created.
      */
     @Override
     public long getItemId(int i) {
@@ -59,25 +50,21 @@ public class AdapterForStudent extends BaseAdapter {
     }
 
     /**
-     * This function returns the view of the student at the given position.
-     * @param position The position of the student.
-     * @param view The view of the student.
-     * @param parent The parent of the view.
-     * @return The view of the student at the given position.
+     * This function is called when the view is created.
      */
     @NonNull
     @Override
     public View getView(int position, @Nullable View view, @NonNull ViewGroup parent) {
         view = inflater.inflate(R.layout.sudent_list_view, parent, false);
 
-        TextView lvTvName = view.findViewById(R.id.lvTvName);
-        TextView lvTvGrade = view.findViewById(R.id.lvTvGrade);
-        TextView lvTvClass = view.findViewById(R.id.lvTvClass);
-        TextView lvTvId = view.findViewById(R.id.lvTvId);
-        ImageView lvImVaccine1 = view.findViewById(R.id.lvImVaccine1);
-        ImageView lvImVaccine2 = view.findViewById(R.id.lvImVaccine2);
+        TextView lvTvName = view.findViewById(R.id.stName);
+        TextView lvTvGrade = view.findViewById(R.id.stGrade);
+        TextView lvTvClass = view.findViewById(R.id.stClass);
+        TextView lvTvId = view.findViewById(R.id.stId);
+        ImageView lvImVaccine1 = view.findViewById(R.id.firstVac);
+        ImageView lvImVaccine2 = view.findViewById(R.id.secondVac);
 
-        Student student = studentsList.get(position);
+        Student student = lst.get(position);
 
         lvTvName.setText(student.getFirstName() + " " + student.getLastName());
         lvTvGrade.setText(student.getGrade() + "th grade");
@@ -86,17 +73,17 @@ public class AdapterForStudent extends BaseAdapter {
 
         if(!student.getCanImmune())
         {
-            lvImVaccine1.setImageResource(R.drawable.cannot_immune);
+            lvImVaccine1.setImageResource(R.drawable.nuhuh);
         }
         else
         {
             if(!student.getFirstVaccine().getPlaceTaken().isEmpty())
             {
-                lvImVaccine1.setImageResource(R.drawable.vaccine);
+                lvImVaccine1.setImageResource(R.drawable.goodjob);
             }
             if(!student.getSecondVaccine().getPlaceTaken().isEmpty())
             {
-                lvImVaccine2.setImageResource(R.drawable.vaccine);
+                lvImVaccine2.setImageResource(R.drawable.goodjob);
             }
         }
 

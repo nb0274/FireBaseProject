@@ -28,7 +28,7 @@ public class StudentsDisplay extends AppCompatActivity implements View.OnCreateC
     ListView lvStudents;
     ArrayList<Student> studentsList;
     AdapterForStudent adapterForStudent;
-    Context activityContext;
+    Context context;
     AlertDialog.Builder adb;
     AlertDialog ad;
     int selectedStudentPosition;
@@ -39,7 +39,16 @@ public class StudentsDisplay extends AppCompatActivity implements View.OnCreateC
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_students_display);
 
-        initViews();
+        lvStudents = findViewById(R.id.lvStudents);
+        lvStudents.setOnCreateContextMenuListener(this);
+        lvStudents.setOnItemLongClickListener(this);
+
+        studentsList = new ArrayList<Student>();
+        adapterForStudent = new AdapterForStudent(this, studentsList);
+        lvStudents.setAdapter(adapterForStudent);
+
+        context = this;
+        selectedStudentPosition = 0;
     }
 
     /**
@@ -50,22 +59,6 @@ public class StudentsDisplay extends AppCompatActivity implements View.OnCreateC
 
         gi = getIntent();
         initStudentsList();
-    }
-
-    /**
-     * This function initializes the views of the activity.
-     */
-    private void initViews() {
-        lvStudents = findViewById(R.id.lvStudents);
-        lvStudents.setOnCreateContextMenuListener(this);
-        lvStudents.setOnItemLongClickListener(this);
-
-        studentsList = new ArrayList<Student>();
-        adapterForStudent = new AdapterForStudent(this, studentsList);
-        lvStudents.setAdapter(adapterForStudent);
-
-        activityContext = this;
-        selectedStudentPosition = 0;
     }
 
     /**
@@ -92,7 +85,7 @@ public class StudentsDisplay extends AppCompatActivity implements View.OnCreateC
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(activityContext, "Failed reading from the DB!",
+                Toast.makeText(context, "Failed reading from the DB!",
                         Toast.LENGTH_SHORT).show();
             }
         });
@@ -106,7 +99,7 @@ public class StudentsDisplay extends AppCompatActivity implements View.OnCreateC
      */
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        menu.setHeaderTitle("Student Actions");
+        menu.setHeaderTitle("Actions");
         menu.add("Show & Edit");
         menu.add("Delete");
     }
@@ -121,8 +114,8 @@ public class StudentsDisplay extends AppCompatActivity implements View.OnCreateC
 
         adb = new AlertDialog.Builder(this);
         adb.setCancelable(false);
-        adb.setTitle("Perform action on Student");
-        adb.setMessage("Are you sure you want to " + action.toLowerCase() + " the student?");
+        adb.setTitle("Action on Student");
+        adb.setMessage("Are you sure you want to " + action.toLowerCase() + "?");
 
         // Validates the choice with the user
         adb.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
@@ -131,7 +124,7 @@ public class StudentsDisplay extends AppCompatActivity implements View.OnCreateC
                 if(action.equals("Show & Edit"))
                 {
                     // Goes to the AddStudentActivity and displays there
-                    gi = new Intent(activityContext, AddStudent.class);
+                    gi = new Intent(context, AddStudent.class);
                     gi.putExtra("Student", studentsList.get(selectedStudentPosition));
                     startActivity(gi);
                 }
@@ -175,7 +168,7 @@ public class StudentsDisplay extends AppCompatActivity implements View.OnCreateC
         studentsList.remove(studentIndex);
         adapterForStudent.notifyDataSetChanged();
 
-        Toast.makeText(this, "Student was deleted!", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Student deleted", Toast.LENGTH_SHORT).show();
     }
 
     @Override
