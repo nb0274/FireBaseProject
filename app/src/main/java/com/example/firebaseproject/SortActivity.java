@@ -419,15 +419,15 @@ public class SortActivity extends AppCompatActivity implements AdapterView.OnIte
         int id = item.getItemId();
 
         if(id == R.id.menuAddStudent) {
-            gi = new Intent(this,AddStudentActivity.class);
+            gi = new Intent(this, AddStudent.class);
             startActivity(gi);
         }
-        else if(id == R.id.menuAllStudents) {
-            gi.setClass(this, AllStudentsActivity.class);
+        else if(id == R.id.menuShowStudents) {
+            gi.setClass(this, StudentsDisplay.class);
             startActivity(gi);
         }
         else if(id == R.id.menuCredits) {
-            gi.setClass(this, CreditsActivity.class);
+            gi.setClass(this, Credits.class);
             startActivity(gi);
         }
 

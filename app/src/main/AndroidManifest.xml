@@ -13,6 +13,9 @@
         android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar"
         tools:targetApi="31">
         <activity
+            android:name=".Credits"
+            android:exported="false" />
+        <activity
             android:name=".SortActivity"
             android:exported="false" />
         <activity

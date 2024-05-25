@@ -491,12 +491,13 @@ public class AddStudent extends AppCompatActivity {
             si.setClass(this, StudentsDisplay.class);
             startActivity(si);
         }
-        else if(id == R.id.menuSortAndFilter) {
+        else if(id == R.id.menuSortStudents) {
             si.setClass(this, SortActivity.class);
             startActivity(si);
         }
-        else {
-            getSavedIds();
+        else if(id == R.id.menuCredits) {
+            si.setClass(this, Credits.class);
+            startActivity(si);
         }
 
         return super.onOptionsItemSelected(item);

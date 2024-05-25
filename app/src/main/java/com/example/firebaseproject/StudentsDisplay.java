@@ -190,12 +190,12 @@ public class StudentsDisplay extends AppCompatActivity implements View.OnCreateC
             gi = new Intent(this, AddStudent.class);
             startActivity(gi);
         }
-        else if(id == R.id.menuSortAndFilter) {
-            gi.setClass(this, SortAndFilterActivity.class);
+        else if(id == R.id.menuCredits) {
+            gi.setClass(this, Credits.class);
             startActivity(gi);
         }
-        else if(id == R.id.menuCredits) {
-            gi.setClass(this, CreditsActivity.class);
+        else if(id == R.id.menuSortStudents) {
+            gi.setClass(this, SortActivity.class);
             startActivity(gi);
         }
 
