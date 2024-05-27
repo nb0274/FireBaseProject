@@ -361,7 +361,7 @@ public class AddStudent extends AppCompatActivity {
                     if(!editMode) {
                         vaccinesData[0] = new Vaccine();
                         vaccinesData[1] = new Vaccine();
-                        idsList.add(editTextID.getText().toString());  // Adds the new student id to the list
+                        idsList.add(editTextID.getText().toString());
                     }
                     else {
                         savedStudent = new Student(student);
